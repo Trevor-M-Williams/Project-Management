@@ -9,6 +9,10 @@ const Home = () => {
   );
   const [filterStatus, setFilterStatus] = useState(1);
 
+  function handleOpen() {
+    setModalOpen(true);
+  }
+
   const toggleFilter = () => {
     if (filterStatus === 1) {
       setFilterStatus(0);
@@ -20,9 +24,9 @@ const Home = () => {
   };
 
   return (
-    <div className="absolute inset-0 overflow-hidden">
+    <div className="absolute inset-0 overflow-hidden p-4">
       <div className="flex flex-col h-full max-w-5xl mx-auto">
-        <Nav toggleFilter={toggleFilter} />
+        <Nav handleOpen={handleOpen} toggleFilter={toggleFilter} />
         <Table data={filteredData} />
       </div>
     </div>
