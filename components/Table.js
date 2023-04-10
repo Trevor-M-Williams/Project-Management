@@ -1,7 +1,25 @@
 import { DataGrid } from "@mui/x-data-grid";
+import { updateTask } from "../firebase";
 
 const Table = ({ data }) => {
   const columns = [
+    {
+      field: "status",
+      headerName: "",
+      width: 50,
+      renderCell: (params) => {
+        return (
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <input
+              type="checkbox"
+              checked={params.value}
+              onChange={() => updateTaskStatus(params)}
+              className="ml-2 cursor-pointer"
+            />
+          </div>
+        );
+      },
+    },
     { field: "name", headerName: "Name", minWidth: 100, flex: 1 },
     {
       field: "client",
@@ -25,7 +43,7 @@ const Table = ({ data }) => {
       align: "right",
       valueGetter: (params) => {
         const date = new Date(params.value);
-        const year = date.getFullYear().toString().substr(-2);
+        const year = date.getFullYear().toString().slice(-2);
         const month = (date.getMonth() + 1).toString().padStart(2, "0");
         const day = date.getDate().toString().padStart(2, "0");
         return `${month}-${day}-${year}`;
@@ -33,13 +51,23 @@ const Table = ({ data }) => {
     },
   ];
 
+  function updateTaskStatus(params) {
+    const updatedTask = {
+      ...params.row,
+      status: !params.row.status,
+    };
+    console.log(updatedTask.status);
+    updateTask(updatedTask);
+  }
+
   return (
-    <div className="grow w-full">
+    <div className="w-full grow">
       <DataGrid
         rows={data}
         columns={columns}
         pageSize={10}
-        checkboxSelection
+        rowSelectionModel={[]}
+        onRowClick={(e) => console.log(e)}
         initialState={{
           filter: {
             items: [

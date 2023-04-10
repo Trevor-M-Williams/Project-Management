@@ -38,8 +38,8 @@ export default function BasicModal() {
       assigned,
       description,
       dueDate: dueDate.$d.toLocaleDateString(),
+      status: false,
     };
-    console.log(data);
     postTask(data);
     handleClose();
   }
@@ -48,7 +48,7 @@ export default function BasicModal() {
     <div>
       <AddCircleOutlineRoundedIcon
         onClick={handleOpen}
-        className="text-blue-400 cursor-pointer"
+        className="cursor-pointer text-blue-400"
       />
       <Modal
         open={open}
@@ -56,8 +56,8 @@ export default function BasicModal() {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box className="absolute top-1/2 left-1/2 w-[90vw] md:w-1/2 max-w-3xl bg-white p-4 -translate-x-1/2 -translate-y-1/2 rounded shadow-lg focus:outline-none">
-          <div className="text-2xl font-medium mb-4">New Task</div>
+        <Box className="absolute left-1/2 top-1/2 w-[90vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded bg-white p-4 shadow-lg focus:outline-none md:w-1/2">
+          <div className="mb-4 text-2xl font-medium">New Task</div>
           <form onSubmit={createTask} className="flex flex-col gap-4">
             <TextField
               label="Name"
@@ -90,13 +90,13 @@ export default function BasicModal() {
                 required
               />
               {validationError && (
-                <p className="text-red-500 mt-1">Please select a date.</p>
+                <p className="mt-1 text-red-500">Please select a date.</p>
               )}
             </LocalizationProvider>
 
             <button
               type="submit"
-              className="bg-blue-400 text-white rounded p-2 mt-2 self-start hover:bg-blue-500"
+              className="mt-2 self-start rounded bg-blue-400 p-2 text-white hover:bg-blue-500"
             >
               Create Task
             </button>

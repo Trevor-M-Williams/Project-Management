@@ -45,6 +45,12 @@ export function postTask(data) {
   set(newTaskRef, data);
 }
 
+export function updateTask(data) {
+  if (!data) return;
+  const taskRef = ref(db, `tasks/${data.id}`);
+  set(taskRef, data);
+}
+
 export const auth = getAuth(app);
 export const storage = getStorage(app);
 export default app;
