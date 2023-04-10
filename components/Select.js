@@ -5,7 +5,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 
-export default function BasicSelect({ assigned, handleChange }) {
+export default function BasicSelect({ taskData, handleChange }) {
   return (
     <Box sx={{ minWidth: 120 }}>
       <FormControl fullWidth>
@@ -13,7 +13,7 @@ export default function BasicSelect({ assigned, handleChange }) {
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={assigned}
+          value={taskData.assigned}
           label="Assigned To"
           onChange={handleChange}
         >

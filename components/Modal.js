@@ -11,33 +11,26 @@ import { postTask } from "../firebase";
 
 export default function BasicModal() {
   const [open, setOpen] = React.useState(false);
-  const [name, setName] = React.useState("");
-  const [client, setClient] = React.useState("");
-  const [assigned, setAssigned] = React.useState("");
-  const [description, setDescription] = React.useState("");
-  const [dueDate, setDueDate] = React.useState(null);
+  const [taskData, setTaskData] = React.useState({});
   const [validationError, setValidationError] = React.useState(false);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const handleChange = (event) => {
-    setAssigned(event.target.value);
+  const handleChange = (e) => {
+    setTaskData({ ...taskData, assigned: e.target.value });
   };
 
   function createTask(e) {
     e.preventDefault();
-    if (!dueDate) {
+    if (!taskData.dueDate) {
       setValidationError(true);
       return;
     } else {
       setValidationError(false);
     }
     const data = {
-      name,
-      client,
-      assigned,
-      description,
-      dueDate: dueDate.$d.toLocaleDateString(),
+      ...taskData,
+      dueDate: taskData.dueDate.$d.toLocaleDateString(),
       status: false,
     };
     postTask(data);
@@ -62,31 +55,39 @@ export default function BasicModal() {
             <TextField
               label="Name"
               variant="outlined"
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) =>
+                setTaskData({ ...taskData, name: e.target.value })
+              }
               required
             />
             <TextField
               label="Description"
               variant="outlined"
               multiline
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) =>
+                setTaskData({ ...taskData, description: e.target.value })
+              }
               required
             />
             <TextField
               label="Client"
               variant="outlined"
-              onChange={(e) => setClient(e.target.value)}
+              onChange={(e) =>
+                setTaskData({ ...taskData, client: e.target.value })
+              }
               required
             />
             <BasicSelect
-              assigned={assigned}
+              taskData={taskData}
               handleChange={handleChange}
               required
             />
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                value={dueDate}
-                onChange={(newDate) => setDueDate(newDate)}
+                value={taskData.dueDate}
+                onChange={(newDate) =>
+                  setTaskData({ ...taskData, dueDate: newDate })
+                }
                 required
               />
               {validationError && (
