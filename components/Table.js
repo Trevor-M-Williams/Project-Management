@@ -1,7 +1,10 @@
+import { useContext } from "react";
+import { TaskContext } from "../contexts/TaskContext";
 import { DataGrid } from "@mui/x-data-grid";
 import { updateTask } from "../firebase";
 
-const Table = ({ data }) => {
+const Table = () => {
+  const { filteredTasks } = useContext(TaskContext);
   const columns = [
     {
       field: "status",
@@ -63,7 +66,7 @@ const Table = ({ data }) => {
   return (
     <div className="w-full grow">
       <DataGrid
-        rows={data}
+        rows={filteredTasks}
         columns={columns}
         pageSize={10}
         rowSelectionModel={[]}
