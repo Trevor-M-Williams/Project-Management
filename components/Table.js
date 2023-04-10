@@ -39,6 +39,7 @@ const Table = ({ data }) => {
         rows={data}
         columns={columns}
         pageSize={10}
+        checkboxSelection
         initialState={{
           filter: {
             items: [

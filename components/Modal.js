@@ -4,19 +4,19 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
-
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { postTask } from "../firebase";
 
 export default function BasicModal() {
   const [open, setOpen] = React.useState(false);
   const [name, setName] = React.useState("");
   const [client, setClient] = React.useState("");
   const [assigned, setAssigned] = React.useState("");
-
   const [description, setDescription] = React.useState("");
   const [dueDate, setDueDate] = React.useState(null);
+  const [validationError, setValidationError] = React.useState(false);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -26,16 +26,21 @@ export default function BasicModal() {
 
   function createTask(e) {
     e.preventDefault();
-    let date;
-    if (dueDate) date = dueDate.$d.toLocaleDateString();
+    if (!dueDate) {
+      setValidationError(true);
+      return;
+    } else {
+      setValidationError(false);
+    }
     const data = {
       name,
       client,
       assigned,
       description,
-      date,
+      dueDate: dueDate.$d.toLocaleDateString(),
     };
     console.log(data);
+    postTask(data);
     handleClose();
   }
 
@@ -61,6 +66,13 @@ export default function BasicModal() {
               required
             />
             <TextField
+              label="Description"
+              variant="outlined"
+              multiline
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
+            <TextField
               label="Client"
               variant="outlined"
               onChange={(e) => setClient(e.target.value)}
@@ -71,19 +83,15 @@ export default function BasicModal() {
               handleChange={handleChange}
               required
             />
-            <TextField
-              label="Description"
-              variant="outlined"
-              multiline
-              onChange={(e) => setDescription(e.target.value)}
-              required
-            />
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 value={dueDate}
                 onChange={(newDate) => setDueDate(newDate)}
                 required
               />
+              {validationError && (
+                <p className="text-red-500 mt-1">Please select a date.</p>
+              )}
             </LocalizationProvider>
 
             <button

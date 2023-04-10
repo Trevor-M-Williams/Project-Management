@@ -1,13 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Nav from "../components/Nav";
 import Table from "../components/Table";
-import { data } from "../data";
+import { getTasks } from "../firebase";
 
 const Home = () => {
-  const [filteredData, setFilteredData] = useState(
-    data.filter((e) => e.status === 1)
+  const [tasks, setTasks] = useState([]);
+  const [filteredTasks, setFilteredTasks] = useState(
+    tasks.filter((e) => e.status === 1)
   );
   const [filterStatus, setFilterStatus] = useState(1);
+
+  useEffect(() => {
+    getTasks(setTasks);
+  }, []);
 
   function handleOpen() {
     setModalOpen(true);
@@ -16,10 +21,10 @@ const Home = () => {
   const toggleFilter = () => {
     if (filterStatus === 1) {
       setFilterStatus(0);
-      setFilteredData(data.filter((e) => e.status === 0));
+      setFilteredTasks(tasks.filter((e) => e.status !== 1));
     } else {
       setFilterStatus(1);
-      setFilteredData(data.filter((e) => e.status === 1));
+      setFilteredTasks(tasks.filter((e) => e.status === 1));
     }
   };
 
@@ -27,7 +32,7 @@ const Home = () => {
     <div className="absolute inset-0 overflow-hidden p-4">
       <div className="flex flex-col h-full max-w-5xl mx-auto">
         <Nav handleOpen={handleOpen} toggleFilter={toggleFilter} />
-        <Table data={filteredData} />
+        <Table data={tasks} />
       </div>
     </div>
   );
