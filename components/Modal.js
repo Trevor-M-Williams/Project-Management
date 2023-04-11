@@ -40,7 +40,7 @@ export default function BasicModal() {
     else setOpen(false);
   }, [taskData ?? null]);
 
-  function createTask(e) {
+  function handleCreate(e) {
     e.preventDefault();
     if (!taskData.dueDate) {
       setValidationError(true);
@@ -58,7 +58,7 @@ export default function BasicModal() {
     handleClose();
   }
 
-  function updateExistingTask(e) {
+  function handleUpdate(e) {
     e.preventDefault();
     if (!taskData.dueDate) {
       setValidationError(true);
@@ -100,7 +100,7 @@ export default function BasicModal() {
               {isNewTask ? "New Task" : "Edit Task"}
             </div>
             <form
-              onSubmit={isNewTask ? createTask : updateExistingTask}
+              onSubmit={isNewTask ? handleCreate : handleUpdate}
               className="flex flex-col gap-4"
             >
               <TextField

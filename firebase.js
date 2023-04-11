@@ -51,6 +51,15 @@ export function updateTask(data) {
   set(taskRef, data);
 }
 
+export function updateAllTasks(tasks) {
+  tasks.forEach((data) => {
+    if (!data) return;
+    if (typeof data.assigned === "string") data.assigned = [data.assigned];
+    const taskRef = ref(db, `tasks/${data.id}`);
+    set(taskRef, data);
+  });
+}
+
 export function deleteTask(id) {
   if (!id) return;
   const taskRef = ref(db, `tasks/${id}`);

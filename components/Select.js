@@ -13,9 +13,10 @@ export default function BasicSelect({ taskData, handleChange }) {
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={taskData?.assigned || ""}
+          value={taskData.assigned || []}
           label="Assigned To"
           onChange={handleChange}
+          multiple
           required
         >
           <MenuItem value="CJ">CJ</MenuItem>
