@@ -60,16 +60,11 @@ export default function BasicModal() {
 
   function handleUpdate(e) {
     e.preventDefault();
-    if (!taskData.dueDate) {
-      setValidationError(true);
-      return;
-    } else {
-      setValidationError(false);
-    }
-
+    let date;
+    if (taskData.dueDate.$d) date = taskData.dueDate.$d.toLocaleDateString();
     const data = {
       ...taskData,
-      dueDate: taskData.dueDate.$d.toLocaleDateString(),
+      dueDate: date,
     };
     updateTask(data);
     handleClose();
@@ -143,9 +138,6 @@ export default function BasicModal() {
                   }
                   required
                 />
-                {validationError && (
-                  <p className="mt-1 text-red-500">Please select a date.</p>
-                )}
               </LocalizationProvider>
 
               <div className="mt-2 flex text-white">
