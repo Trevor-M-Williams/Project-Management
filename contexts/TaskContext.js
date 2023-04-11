@@ -5,7 +5,7 @@ export const TaskContext = createContext();
 
 function TaskProvider({ children }) {
   const [tasks, setTasks] = useState([]);
-  const [taskData, setTaskData] = useState({});
+  const [taskData, setTaskData] = useState(null);
   const [filteredTasks, setFilteredTasks] = useState(
     tasks.filter((e) => e.status === false)
   );

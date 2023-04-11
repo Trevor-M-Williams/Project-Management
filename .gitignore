@@ -5,6 +5,11 @@
 /.pnp
 .pnp.js
 
+# Firebase cache and config files
+.firebase/
+.firebaserc
+.firebase.json
+
 # testing
 /coverage
 

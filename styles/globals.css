@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+.css-1usso8h-MuiDataGrid-root .MuiDataGrid-columnHeader:focus,
+.css-1usso8h-MuiDataGrid-root .MuiDataGrid-cell:focus {
+  outline: none;
+}
+
+.MuiDataGrid-columnHeaderTitle {
+  font-weight: bold;
+}
+
 html,
 body {
   padding: 0;

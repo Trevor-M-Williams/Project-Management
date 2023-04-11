@@ -51,6 +51,12 @@ export function updateTask(data) {
   set(taskRef, data);
 }
 
+export function deleteTask(id) {
+  if (!id) return;
+  const taskRef = ref(db, `tasks/${id}`);
+  set(taskRef, null);
+}
+
 export const auth = getAuth(app);
 export const storage = getStorage(app);
 export default app;

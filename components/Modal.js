@@ -1,4 +1,5 @@
-import * as React from "react";
+import { useState, useContext, useEffect } from "react";
+import { TaskContext } from "../contexts/TaskContext";
 import BasicSelect from "./Select";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
@@ -7,18 +8,37 @@ import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRou
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { postTask } from "../firebase";
+import { postTask, updateTask, deleteTask } from "../firebase";
 
 export default function BasicModal() {
-  const [open, setOpen] = React.useState(false);
-  const [taskData, setTaskData] = React.useState({});
-  const [validationError, setValidationError] = React.useState(false);
+  const { taskData, setTaskData } = useContext(TaskContext);
+  const [open, setOpen] = useState(false);
+  const [validationError, setValidationError] = useState(false);
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleOpen = () => setTaskData({});
+  const handleClose = () => setTaskData(null);
   const handleChange = (e) => {
     setTaskData({ ...taskData, assigned: e.target.value });
   };
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+
+    function handleKeyDown(e) {
+      if (e.ctrlKey && e.altKey && e.key.toLowerCase() === "n") {
+        handleOpen();
+      }
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (taskData) setOpen(true);
+    else setOpen(false);
+  }, [taskData ?? null]);
 
   function createTask(e) {
     e.preventDefault();
@@ -28,6 +48,7 @@ export default function BasicModal() {
     } else {
       setValidationError(false);
     }
+
     const data = {
       ...taskData,
       dueDate: taskData.dueDate.$d.toLocaleDateString(),
@@ -37,73 +58,117 @@ export default function BasicModal() {
     handleClose();
   }
 
+  function updateExistingTask(e) {
+    e.preventDefault();
+    if (!taskData.dueDate) {
+      setValidationError(true);
+      return;
+    } else {
+      setValidationError(false);
+    }
+
+    const data = {
+      ...taskData,
+      dueDate: taskData.dueDate.$d.toLocaleDateString(),
+    };
+    updateTask(data);
+    handleClose();
+  }
+
+  function handleDelete() {
+    deleteTask(taskData.id);
+    handleClose();
+  }
+
+  const isNewTask = !taskData?.id;
+
   return (
     <div>
       <AddCircleOutlineRoundedIcon
         onClick={handleOpen}
         className="cursor-pointer text-blue-400"
       />
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box className="absolute left-1/2 top-1/2 w-[90vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded bg-white p-4 shadow-lg focus:outline-none md:w-1/2">
-          <div className="mb-4 text-2xl font-medium">New Task</div>
-          <form onSubmit={createTask} className="flex flex-col gap-4">
-            <TextField
-              label="Name"
-              variant="outlined"
-              onChange={(e) =>
-                setTaskData({ ...taskData, name: e.target.value })
-              }
-              required
-            />
-            <TextField
-              label="Description"
-              variant="outlined"
-              multiline
-              onChange={(e) =>
-                setTaskData({ ...taskData, description: e.target.value })
-              }
-              required
-            />
-            <TextField
-              label="Client"
-              variant="outlined"
-              onChange={(e) =>
-                setTaskData({ ...taskData, client: e.target.value })
-              }
-              required
-            />
-            <BasicSelect
-              taskData={taskData}
-              handleChange={handleChange}
-              required
-            />
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                value={taskData.dueDate}
-                onChange={(newDate) =>
-                  setTaskData({ ...taskData, dueDate: newDate })
+      {taskData && (
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-notes"
+        >
+          <Box className="absolute left-1/2 top-1/2 w-[90vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded bg-white p-4 shadow-lg focus:outline-none md:w-1/2">
+            <div className="mb-4 text-2xl font-medium">
+              {isNewTask ? "New Task" : "Edit Task"}
+            </div>
+            <form
+              onSubmit={isNewTask ? createTask : updateExistingTask}
+              className="flex flex-col gap-4"
+            >
+              <TextField
+                label="Name"
+                variant="outlined"
+                value={taskData.name || ""}
+                onChange={(e) =>
+                  setTaskData({ ...taskData, name: e.target.value })
                 }
                 required
               />
-              {validationError && (
-                <p className="mt-1 text-red-500">Please select a date.</p>
-              )}
-            </LocalizationProvider>
+              <TextField
+                label="Notes"
+                variant="outlined"
+                multiline
+                value={taskData.notes || ""}
+                onChange={(e) =>
+                  setTaskData({ ...taskData, notes: e.target.value })
+                }
+              />
+              <TextField
+                label="Client"
+                variant="outlined"
+                value={taskData.client || ""}
+                onChange={(e) =>
+                  setTaskData({ ...taskData, client: e.target.value })
+                }
+                required
+              />
+              <BasicSelect
+                taskData={taskData}
+                handleChange={handleChange}
+                required
+              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  value={taskData.dueDate || null}
+                  onChange={(newDate) =>
+                    setTaskData({ ...taskData, dueDate: newDate })
+                  }
+                  required
+                />
+                {validationError && (
+                  <p className="mt-1 text-red-500">Please select a date.</p>
+                )}
+              </LocalizationProvider>
 
-            <button
-              type="submit"
-              className="mt-2 self-start rounded bg-blue-400 p-2 text-white hover:bg-blue-500"
-            >
-              Create Task
-            </button>
-          </form>
-        </Box>
-      </Modal>
+              <div className="mt-2 flex text-white">
+                <button
+                  type="submit"
+                  className="self-start rounded bg-blue-500 p-2 hover:bg-blue-600"
+                >
+                  {isNewTask ? "Create Task" : "Update"}
+                </button>
+
+                {!isNewTask && (
+                  <button
+                    onClick={handleDelete}
+                    className="ml-4 self-start rounded bg-red-500 p-2 hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
+            </form>
+          </Box>
+        </Modal>
+      )}
     </div>
   );
 }

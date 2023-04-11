@@ -1,10 +1,11 @@
 import { useContext } from "react";
 import { TaskContext } from "../contexts/TaskContext";
 import { DataGrid } from "@mui/x-data-grid";
-import { updateTask } from "../firebase";
+import { updateTask, deleteTask } from "../firebase";
+import dayjs from "dayjs";
 
 const Table = () => {
-  const { filteredTasks } = useContext(TaskContext);
+  const { filteredTasks, setTaskData } = useContext(TaskContext);
   const columns = [
     {
       field: "status",
@@ -16,6 +17,7 @@ const Table = () => {
             <input
               type="checkbox"
               checked={params.value}
+              onClick={(e) => e.stopPropagation()}
               onChange={() => updateTaskStatus(params)}
               className="ml-2 cursor-pointer"
             />
@@ -41,16 +43,10 @@ const Table = () => {
     {
       field: "dueDate",
       headerName: "Due Date",
-      width: 100,
+      width: 120,
       headerAlign: "right",
       align: "right",
-      valueGetter: (params) => {
-        const date = new Date(params.value);
-        const year = date.getFullYear().toString().slice(-2);
-        const month = (date.getMonth() + 1).toString().padStart(2, "0");
-        const day = date.getDate().toString().padStart(2, "0");
-        return `${month}-${day}-${year}`;
-      },
+      sortComparator: (v1, v2) => dayjs(v1).valueOf() - dayjs(v2).valueOf(),
     },
   ];
 
@@ -59,7 +55,6 @@ const Table = () => {
       ...params.row,
       status: !params.row.status,
     };
-    console.log(updatedTask.status);
     updateTask(updatedTask);
   }
 
@@ -70,7 +65,12 @@ const Table = () => {
         columns={columns}
         pageSize={10}
         rowSelectionModel={[]}
-        onRowClick={(e) => console.log(e)}
+        onRowClick={(e) => {
+          setTaskData({
+            ...e.row,
+            dueDate: dayjs(e.row.dueDate, "M/D/YYYY"),
+          });
+        }}
         initialState={{
           filter: {
             items: [
@@ -85,6 +85,7 @@ const Table = () => {
             sortModel: [{ field: "dueDate", sort: "asc" }],
           },
         }}
+        className="md:text-base"
       />
     </div>
   );

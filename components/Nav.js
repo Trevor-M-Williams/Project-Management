@@ -4,7 +4,7 @@ import BasicModal from "./Modal";
 import Switch from "@mui/material/Switch";
 
 function Nav() {
-  const { setFilterStatus } = useContext(TaskContext);
+  const { filterStatus, setFilterStatus } = useContext(TaskContext);
 
   function toggleFilter() {
     setFilterStatus((prev) => !prev);
@@ -12,7 +12,9 @@ function Nav() {
 
   return (
     <div className="flex w-full items-center justify-between pb-4">
-      <div>Tasks</div>
+      <div className="text-lg font-medium uppercase">
+        {filterStatus ? "Completed" : "Todo"}
+      </div>
       <div className="flex items-center">
         <BasicModal />
         <Switch onClick={toggleFilter} />
